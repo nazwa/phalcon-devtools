@@ -219,11 +219,20 @@ class Model extends Component
 ";
 
         $templateCode = "<?php
+        %s
+        %s
+        abstract class %s extends %s
+        {
+        %s
+        }
+        ";
+
+        $templateFront = "<?php
 %s
-%s
+%s 
 class %s extends %s
 {
-%s
+
 }
 ";
 
@@ -252,19 +261,21 @@ class %s extends %s
         }
 
         if ($this->isAbsolutePath($modelsDir) == false) {
-            $modelPath = $path . "public" . DIRECTORY_SEPARATOR . $modelsDir;
+            $baseModelPath = $path . "public" . DIRECTORY_SEPARATOR . $modelsDir;
         } else {
-            $modelPath = $modelsDir;
+            $baseModelPath = $modelsDir;
         }
 
-        $methodRawCode = array();
+        $methodRawCode = array();                       
+        $baseClassName = 'base' . $this->_options['className'];
         $className = $this->_options['className'];
-        $modelPath .= $className . '.php';
+        $modelPath = $baseClassName . '.php';
+        $baseModelPath .= 'base/base' . $baseClassName . '.php';
 
-        if (file_exists($modelPath)) {
+        if (file_exists($baseModelPath)) {
             if (!$this->_options['force']) {
                 throw new BuilderException(
-                    "The model file '" . $className .
+                    "The model file '" . $baseClassName .
                     ".php' already exists in models dir"
                 );
             }
@@ -386,7 +397,7 @@ class %s extends %s
 
         $alreadyInitialized = false;
         $alreadyValidations = false;
-        if (file_exists($modelPath)) {
+        if (file_exists($baseModelPath)) {
             try {
                 $possibleMethods = array();
                 if ($useSettersGetters) {
@@ -397,9 +408,9 @@ class %s extends %s
                     }
                 }
 
-                require $modelPath;
+                require $baseModelPath;
 
-                $linesCode = file($modelPath);
+                $linesCode = file($baseModelPath);
                 $reflection = new \ReflectionClass($this->_options['className']);
                 foreach ($reflection->getMethods() as $method) {
                     if ($method->getDeclaringClass()->getName() == $this->_options['className']) {
@@ -573,7 +584,7 @@ class %s extends %s
         }
 
         if ($genDocMethods) {
-            $content .= sprintf($templateFind, $className, $className);
+            $content .= sprintf($templateFind, $baseClassName, $baseClassName);
         }
 
         if (isset($this->_options['mapColumn'])) {
@@ -584,11 +595,19 @@ class %s extends %s
             $templateCode,
             $license,
             $namespace,
-            $className,
+            $baseClassName,
             $extends,
             $content
         );
-        file_put_contents($modelPath, $code);
+        file_put_contents($baseModelPath, $code);
+        
+        // <----
+        // Only create the front class if it doesnt exist
+        // ---->
+        if( !file_exists($modelPath)) {
+            $code = sprintf($templateFront, $license, '', $className, $baseClassName);
+            file_put_contents($modelPath, $code);
+        }
 
         print Color::success(
                 'Model "' . $this->_options['name'] .
