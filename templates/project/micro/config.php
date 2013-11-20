@@ -10,6 +10,7 @@ return new \Phalcon\Config(array(
 	),
 	'application' => array(
 		'modelsDir'      => __DIR__ . '/../models/',
+        'modelsBaseDir' => __DIR__ . '/../models/base/',
 		'viewsDir'      => __DIR__ . '/../views/',
 		'baseUri'        => '/@@name@@/',
 	)

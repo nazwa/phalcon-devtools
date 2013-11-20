@@ -11,6 +11,7 @@ return new \Phalcon\Config(array(
 	'application' => array(
 		'controllersDir' => __DIR__ . '/../../app/controllers/',
 		'modelsDir'      => __DIR__ . '/../../app/models/',
+        'modelsBaseDir' => __DIR__ . '/../models/base/',
 		'viewsDir'       => __DIR__ . '/../../app/views/',
 		'pluginsDir'     => __DIR__ . '/../../app/plugins/',
 		'libraryDir'     => __DIR__ . '/../../app/library/',
