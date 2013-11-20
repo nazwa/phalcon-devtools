@@ -219,13 +219,13 @@ class Model extends Component
 ";
 
         $templateCode = "<?php
-        %s
-        %s
-        abstract class %s extends %s
-        {
-        %s
-        }
-        ";
+%s
+%s
+abstract class %s extends %s
+{
+%s
+}
+";
 
         $templateFront = "<?php
 %s
@@ -248,29 +248,53 @@ class %s extends %s
         }
 
         $config = $this->_getConfig($path);
-
+           
         if (!isset($this->_options['modelsDir'])) {
             if (!isset($config->application->modelsDir)) {
                 throw new BuilderException(
-                    "Builder doesn't knows where is the models directory"
+                    "Builder doesn't knows where is the models directory: 'modelsDir'"
                 );
             }
             $modelsDir = $config->application->modelsDir;
         } else {
             $modelsDir = $this->_options['modelsDir'];
         }
-
-        if ($this->isAbsolutePath($modelsDir) == false) {
-            $baseModelPath = $path . "public" . DIRECTORY_SEPARATOR . $modelsDir;
+        if (!isset($this->_options['modelsBaseDir'])) {
+            if (!isset($config->application->modelsBaseDir)) {
+                throw new BuilderException(
+                    "Builder doesn't knows where is the models base directory: 'modelsBaseDir'"
+                );
+            }
+            $modelsBaseDir = $config->application->modelsBaseDir;
         } else {
-            $baseModelPath = $modelsDir;
+            $modelsBaseDir = $this->_options['modelsBaseDir'];
+        }
+             
+        if ($this->isAbsolutePath($modelsDir) == false) {
+            $modelPath = $path . "public" . DIRECTORY_SEPARATOR . $modelsDir;
+        } else {
+            $modelPath = $modelsDir;
+        }
+        if ($this->isAbsolutePath($modelsBaseDir) == false) {
+            $baseModelPath = $path . "public" . DIRECTORY_SEPARATOR . $modelsBaseDir;
+        } else {
+            $baseModelPath = $modelsBaseDir;
+        }
+                             
+        // <----
+        // See if it exis and throw error if not
+        // ---->                                        
+        if( !file_exists($baseModelPath)) {
+            throw new BuilderException(
+                    "Models base dir doesnt exist or is not writeable"
+            );
         }
 
         $methodRawCode = array();                       
-        $baseClassName = 'base' . $this->_options['className'];
+        $baseClassName = 'Raw' . $this->_options['className'];
         $className = $this->_options['className'];
-        $modelPath = $baseClassName . '.php';
-        $baseModelPath .= 'base/base' . $baseClassName . '.php';
+        $modelPath .= $className . '.php';
+        $baseModelPath .= $baseClassName . '.php';
 
         if (file_exists($baseModelPath)) {
             if (!$this->_options['force']) {
@@ -598,9 +622,10 @@ class %s extends %s
             $baseClassName,
             $extends,
             $content
-        );
+        );                         
+     
         file_put_contents($baseModelPath, $code);
-        
+           
         // <----
         // Only create the front class if it doesnt exist
         // ---->
