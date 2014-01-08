@@ -1,21 +1,21 @@
 <?php
 
 /*
-	+------------------------------------------------------------------------+
-	| Phalcon Framework                                                      |
-	+------------------------------------------------------------------------+
-	| Copyright (c) 2011-2013 Phalcon Team (http://www.phalconphp.com)       |
-	+------------------------------------------------------------------------+
-	| This source file is subject to the New BSD License that is bundled     |
-	| with this package in the file docs/LICENSE.txt.                        |
-	|                                                                        |
-	| If you did not receive a copy of the license and are unable to         |
-	| obtain it through the world-wide-web, please send an email             |
-	| to license@phalconphp.com so we can send you a copy immediately.       |
-	+------------------------------------------------------------------------+
-	| Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-	|          Eduar Carvajal <eduar@phalconphp.com>                         |
-	+------------------------------------------------------------------------+
+  +------------------------------------------------------------------------+
+  | Phalcon Developer Tools                                                |
+  +------------------------------------------------------------------------+
+  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  +------------------------------------------------------------------------+
+  | This source file is subject to the New BSD License that is bundled     |
+  | with this package in the file docs/LICENSE.txt.                        |
+  |                                                                        |
+  | If you did not receive a copy of the license and are unable to         |
+  | obtain it through the world-wide-web, please send an email             |
+  | to license@phalconphp.com so we can send you a copy immediately.       |
+  +------------------------------------------------------------------------+
+  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
+  |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  +------------------------------------------------------------------------+
 */
 
 namespace Phalcon\Commands\Builtin;
@@ -34,7 +34,10 @@ class Enumerate extends Command implements CommandsInterface
 
 	protected $_possibleParameters = array();
 
-	public function run($parameters)
+    /**
+     * @param $parameters
+     */
+    public function run($parameters)
 	{
 		print Color::colorize('Available commands:', Color::FG_BROWN) . PHP_EOL ;
 		foreach ($this->getScript()->getCommands() as $commands) {
@@ -74,7 +77,7 @@ class Enumerate extends Command implements CommandsInterface
 	public function getHelp()
 	{
 		print Color::head('Help:') . PHP_EOL;
-		print Color::colorize('  Lists the commands availables in Phalcon devtools') . PHP_EOL . PHP_EOL;
+		print Color::colorize('  Lists the commands available in Phalcon devtools') . PHP_EOL . PHP_EOL;
 
 		$this->run(array());
 	}
