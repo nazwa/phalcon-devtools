@@ -18,35 +18,22 @@
   +------------------------------------------------------------------------+
 */
 
-namespace Phalcon\Commands;
+/**
+ * Phalcon Developers Tools can only be used in local machines, however
+ * you can set this to allow certain IP address.
+ *
+ * For example:
+ *   192.168.0.1 or SUBNET 192., 10.0.2., 86.84.124.
+ *
+ * @var string
+ */
+define('PTOOLS_IP', '192.168.');
 
-use Phalcon\Script,
-    Phalcon\Events\Event;
+// ---------------------------- DO NOT EDIT BELOW ------------------------------
 
 /**
- * Phalcon\Commands\CommandListener
+ * The path to the Phalcon Developers Tools.
  *
- * Listens for events in commands
+ * @var string
  */
-class CommandsListener
-{
-
-    public function beforeCommand(Event $event, Command $command)
-    {
-
-        if ($command->canBeExternal() == false) {
-            $path = $command->getOption('directory');
-            if (!file_exists($path . '.phalcon')) {
-                throw new CommandsException("This command should be invoked inside a Phalcon project directory");
-            }
-        }
-
-        $parameters = $command->parseParameters();
-        if (count($parameters) < ($command->getRequiredParams() + 1) || $command->isReceivedOption('help') || $command->getOption(1) == 'help') {
-            $command->getHelp();
-
-            return false;
-        }
-    }
-
-}
+define('PTOOLSPATH', '@@PATH@@');

@@ -1,6 +1,6 @@
 <?php
 
-return new \Phalcon\Config(array(
+return new \Phalcon\Config(array(  
 	'database' => array(
 		'adapter'     => 'Mysql',
 		'host'        => 'localhost',
@@ -17,5 +17,5 @@ return new \Phalcon\Config(array(
 		'libraryDir'     => __DIR__ . '/../../app/library/',
 		'cacheDir'       => __DIR__ . '/../../app/cache/',
 		'baseUri'        => '/@@name@@/',
-	)
+	)    
 ));
