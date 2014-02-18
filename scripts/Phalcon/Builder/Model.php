@@ -632,10 +632,8 @@ class %s extends %s
         $code = sprintf(
             $templateCode,
             $license,
-            $namespace,  
-            $baseClassName, 
-            $str_use,
-            $className,                           
+            $str_use,  
+            $baseClassName,
             $extends,
             $content
         );                         
