@@ -102,8 +102,8 @@ class Model extends Component
         return '%s';
     }
 ";
-        $templateThis = "\t\t\$this->%s(%s);\n";
-        $templateRelation = "\t\t\$this->%s(\"%s\", \"%s\", \"%s\", %s);\n";
+        $templateThis = "        \$this->%s(%s);" . PHP_EOL;
+        $templateRelation = "        \$this->%s('%s', '%s', '%s', %s);" . PHP_EOL;
         $templateSetter = "
     /**
      * Method to set the value of field %s
@@ -123,9 +123,9 @@ class Model extends Component
         \$this->validate(
             new InclusionIn(
                 array(
-                    \"field\"    => \"%s\",
-                    \"domain\"   => array(%s),
-                    \"required\" => true,
+                    'field'    => '%s',
+                    'domain'   => array(%s),
+                    'required' => true,
                 )
             )
         );";
@@ -134,8 +134,8 @@ class Model extends Component
         \$this->validate(
             new Email(
                 array(
-                    \"field\"    => \"%s\",
-                    \"required\" => true,
+                    'field'    => '%s',
+                    'required' => true,
                 )
             )
         );";
@@ -151,7 +151,7 @@ class Model extends Component
      * @var %s
      */
     %s \$%s;
-     ";
+";
 
         $templateGetterMap = "
     /**
@@ -222,19 +222,10 @@ class Model extends Component
         $templateUse = 'use %s;';
         $templateUseAs = 'use %s as %s;';
 
-        $templateCode = "<?php
-%s
-%s            
-abstract class %s extends %s                    
-{
-%s
-}
-";
+       
+        $templateFront = "<?php 
 
-        $templateFront = "<?php
-%s
-%s 
-class %s extends %s
+%s%s%sclass %s extends %s                           
 {
 
 }
@@ -592,31 +583,31 @@ class %s extends %s
         if ($alreadyValidations == false) {
             if (count($validations) > 0) {
                 $validationsCode = sprintf(
-                    $templateValidations, join("", $validations)
+                    $templateValidations, join('', $validations)
                 );
             } else {
-                $validationsCode = "";
+                $validationsCode = '';
             }
         } else {
-            $validationsCode = "";
+            $validationsCode = '';
         }
 
         if ($alreadyInitialized == false) {
             if (count($initialize) > 0) {
                 $initCode = sprintf(
                     $templateInitialize,
-                    join('', $initialize)
+                    rtrim(join('', $initialize))
                 );
             } else {
-                $initCode = "";
+                $initCode = '';
             }
         } else {
-            $initCode = "";
+            $initCode = '';
         }
 
         $license = '';
         if (file_exists('license.txt')) {
-            $license = file_get_contents('license.txt');
+            $license = trim(file_get_contents('license.txt')) . PHP_EOL . PHP_EOL;
         }
 
         $content = join('', $attributes);
@@ -639,7 +630,10 @@ class %s extends %s
             $content .= $this->_genColumnMapCode($fields);
         }
 
-        $str_use = implode("\n", $uses);
+        $str_use = '';
+        if (!empty($uses)) {
+            $str_use = implode(PHP_EOL, $uses) . PHP_EOL . PHP_EOL;
+        }
 
         $code = sprintf(
             $templateCode,
@@ -684,7 +678,7 @@ class %s extends %s
                 $val = "'{$val}'";
             }
 
-            $values[] = sprintf('"%s"=>%s', $name, $val);
+            $values[] = sprintf('\'%s\' => %s', $name, $val);
         }
 
         $syntax = 'array('. implode(',', $values). ')';
