@@ -240,6 +240,8 @@ class Model extends Component
             if ($this->_options['directory']) {
                 $path = $this->_options['directory'] . '/';
             }
+        } else {
+            $path = '.';
         }
 
         $config = $this->_getConfig($path);
@@ -254,6 +256,10 @@ class Model extends Component
         } else {
             $modelsDir = $this->_options['modelsDir'];
         }
+        
+        $modelsDir = rtrim(rtrim($modelsDir, '/'), '\\') . DIRECTORY_SEPARATOR; 
+
+        
         if (!isset($this->_options['modelsBaseDir'])) {
             if (!isset($config->application->modelsBaseDir)) {
                 throw new BuilderException(
@@ -263,19 +269,16 @@ class Model extends Component
             $modelsBaseDir = $config->application->modelsBaseDir;
         } else {
             $modelsBaseDir = $this->_options['modelsBaseDir'];
-        }
-             
+        }      
+        
         if ($this->isAbsolutePath($modelsDir) == false) {
-            $modelPath = $path . "public" . DIRECTORY_SEPARATOR . $modelsDir;
+            $modelPath = $path . DIRECTORY_SEPARATOR . $modelsDir;
         } else {
             $modelPath = $modelsDir;
         }
-        if ($this->isAbsolutePath($modelsBaseDir) == false) {
-            $baseModelPath = $path . "public" . DIRECTORY_SEPARATOR . $modelsBaseDir;
-        } else {
-            $baseModelPath = $modelsBaseDir;
-        }
-                             
+        
+        $modelPath . 'base' . DIRECTORY_SEPARATOR;
+                                           
         // <----
         // See if it exis and throw error if not
         // ---->                                        
