@@ -222,6 +222,14 @@ class Model extends Component
         $templateUse = 'use %s;';
         $templateUseAs = 'use %s as %s;';
 
+        $templateCode = "<?php
+        
+%s%s%sabstract class %s extends %s                    
+{
+%s
+}
+";
+
        
         $templateFront = "<?php 
 
@@ -258,38 +266,29 @@ class Model extends Component
         }
         
         $modelsDir = rtrim(rtrim($modelsDir, '/'), '\\') . DIRECTORY_SEPARATOR; 
-
-        
-        if (!isset($this->_options['modelsBaseDir'])) {
-            if (!isset($config->application->modelsBaseDir)) {
-                throw new BuilderException(
-                    "Builder doesn't knows where is the models base directory: 'modelsBaseDir'"
-                );
-            }
-            $modelsBaseDir = $config->application->modelsBaseDir;
-        } else {
-            $modelsBaseDir = $this->_options['modelsBaseDir'];
-        }      
-        
+                                             
         if ($this->isAbsolutePath($modelsDir) == false) {
             $modelPath = $path . DIRECTORY_SEPARATOR . $modelsDir;
         } else {
             $modelPath = $modelsDir;
         }
         
-        $modelPath . 'base' . DIRECTORY_SEPARATOR;
+        $baseModelPath = $modelPath . 'base' . DIRECTORY_SEPARATOR;
                                            
         // <----
         // See if it exis and throw error if not
         // ---->                                        
         if( !file_exists($baseModelPath)) {
-            throw new BuilderException(
+            if(! mkdir($baseModelPath, 0774, true) || !is_writable($baseModelPath)) {
+                throw new BuilderException(
                     "Models base dir doesnt exist or is not writeable"
-            );
+                );    
+            }
+            
         }
 
         $methodRawCode = array();                       
-        $baseClassName = 'Raw' . $this->_options['className'];
+        $baseClassName = 'Base' . $this->_options['className'];
         $className = $this->_options['className'];
         $modelPath .= $className . '.php';
         $baseModelPath .= $baseClassName . '.php';
@@ -316,15 +315,16 @@ class Model extends Component
             );
         }
 
-        if (isset($this->_options['namespace'])) {
+        if (isset($this->_options['namespace'])) { 
             $namespace = 'namespace ' . $this->_options['namespace'] . ';'
+                . PHP_EOL . PHP_EOL;
+            $namespaceBase = 'namespace ' . $this->_options['namespace'] . '\Base;'
                 . PHP_EOL . PHP_EOL;
             $methodRawCode[] = sprintf($getSource, $this->_options['name']);
         } else {
             $namespace = '';
-        }
-        
-        echo '\n\r---' . $namespace . '----\n\r'; exit;
+            $namespaceBase = '';
+        }                                                                                                         
 
         $useSettersGetters = $this->_options['genSettersGetters'];
         if (isset($this->_options['genDocMethods'])) {
@@ -638,24 +638,29 @@ class Model extends Component
         $str_use = '';
         if (!empty($uses)) {
             $str_use = implode(PHP_EOL, $uses) . PHP_EOL . PHP_EOL;
-        }
+        }                                           
 
         $code = sprintf(
             $templateCode,
             $license,
+            $namespaceBase,
             $str_use,  
             $baseClassName,
             $extends,
             $content
         );                         
-     
+                              
         file_put_contents($baseModelPath, $code);
-           
+        
         // <----
         // Only create the front class if it doesnt exist
         // ---->
         if( !file_exists($modelPath)) {
-            $code = sprintf($templateFront, $license, '', $className, $baseClassName);
+            $str_use = '';
+            if( isset($this->_options['namespace'])) {
+                $str_use = 'use ' . $this->_options['namespace'] . '\\Base\\' . $baseClassName . ';' . PHP_EOL . PHP_EOL;
+            }
+            $code = sprintf($templateFront, $license, $namespace, $str_use, $className, $baseClassName);
             file_put_contents($modelPath, $code);
         }
 
