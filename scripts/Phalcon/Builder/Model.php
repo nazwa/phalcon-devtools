@@ -323,6 +323,8 @@ class Model extends Component
         } else {
             $namespace = '';
         }
+        
+        echo '\n\r---' . $namespace . '----\n\r'; exit;
 
         $useSettersGetters = $this->_options['genSettersGetters'];
         if (isset($this->_options['genDocMethods'])) {
