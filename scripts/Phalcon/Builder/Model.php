@@ -223,17 +223,17 @@ class Model extends Component
         $templateUseAs = 'use %s as %s;';
 
         $templateCode = "<?php
-        
-%s%s%sabstract class %s extends %s                    
+
+%s%s%sabstract class %s extends %s
 {
 %s
 }
 ";
 
-       
-        $templateFront = "<?php 
 
-%s%s%sclass %s extends %s                           
+        $templateFront = "<?php
+
+%s%s%sclass %s extends %s
 {
 
 }
@@ -253,7 +253,7 @@ class Model extends Component
         }
 
         $config = $this->_getConfig($path);
-           
+
         if (!isset($this->_options['modelsDir'])) {
             if (!isset($config->application->modelsDir)) {
                 throw new BuilderException(
@@ -264,30 +264,30 @@ class Model extends Component
         } else {
             $modelsDir = $this->_options['modelsDir'];
         }
-        
-        $modelsDir = rtrim(rtrim($modelsDir, '/'), '\\') . DIRECTORY_SEPARATOR; 
-                                             
+
+        $modelsDir = rtrim(rtrim($modelsDir, '/'), '\\') . DIRECTORY_SEPARATOR;
+
         if ($this->isAbsolutePath($modelsDir) == false) {
             $modelPath = $path . DIRECTORY_SEPARATOR . $modelsDir;
         } else {
             $modelPath = $modelsDir;
         }
-        
+
         $baseModelPath = $modelPath . 'base' . DIRECTORY_SEPARATOR;
-                                           
+
         // <----
         // See if it exis and throw error if not
-        // ---->                                        
+        // ---->
         if( !file_exists($baseModelPath)) {
             if(! mkdir($baseModelPath, 0774, true) || !is_writable($baseModelPath)) {
                 throw new BuilderException(
                     "Models base dir doesnt exist or is not writeable"
-                );    
+                );
             }
-            
+
         }
 
-        $methodRawCode = array();                       
+        $methodRawCode = array();
         $baseClassName = 'Base' . $this->_options['className'];
         $className = $this->_options['className'];
         $modelPath .= $className . '.php';
@@ -315,7 +315,7 @@ class Model extends Component
             );
         }
 
-        if (isset($this->_options['namespace'])) { 
+        if (isset($this->_options['namespace'])) {
             $namespace = 'namespace ' . $this->_options['namespace'] . ';'
                 . PHP_EOL . PHP_EOL;
             $namespaceBase = 'namespace ' . $this->_options['namespace'] . '\Base;'
@@ -324,7 +324,7 @@ class Model extends Component
         } else {
             $namespace = '';
             $namespaceBase = '';
-        }                                                                                                         
+        }
 
         $useSettersGetters = $this->_options['genSettersGetters'];
         if (isset($this->_options['genDocMethods'])) {
@@ -450,9 +450,13 @@ class Model extends Component
                 require $baseModelPath;
 
                 $linesCode = file($baseModelPath);
-                $reflection = new \ReflectionClass($this->_options['className']);
+                $fullClassName = $this->_options['className'];
+                if (isset($this->_options['namespace'])) {
+                    $fullClassName = $this->_options['namespace'].'\\'.$fullClassName;
+                }
+                $reflection = new \ReflectionClass($fullClassName);
                 foreach ($reflection->getMethods() as $method) {
-                    if ($method->getDeclaringClass()->getName() == $this->_options['className']) {
+                    if ($method->getDeclaringClass()->getName() == $fullClassName) {
                         $methodName = $method->getName();
                         if (!isset($possibleMethods[$methodName])) {
                             $methodRawCode[$methodName] = join(
@@ -638,20 +642,20 @@ class Model extends Component
         $str_use = '';
         if (!empty($uses)) {
             $str_use = implode(PHP_EOL, $uses) . PHP_EOL . PHP_EOL;
-        }                                           
+        }
 
         $code = sprintf(
             $templateCode,
             $license,
             $namespaceBase,
-            $str_use,  
+            $str_use,
             $baseClassName,
             $extends,
             $content
-        );                         
-                              
+        );
+
         file_put_contents($baseModelPath, $code);
-        
+
         // <----
         // Only create the front class if it doesnt exist
         // ---->
@@ -661,8 +665,12 @@ class Model extends Component
                 $str_use = 'use ' . $this->_options['namespace'] . '\\Base\\' . $baseClassName . ';' . PHP_EOL . PHP_EOL;
             }
             $code = sprintf($templateFront, $license, $namespace, $str_use, $className, $baseClassName);
-            file_put_contents($modelPath, $code);
-        }
+            if (!@file_put_contents($modelPath, $code)) {
+                throw new BuilderException("Unable to write to '$modelPath'");
+            }
+        };
+
+
 
         if ($this->isConsole()) {
             $this->_notifySuccess('Model "' . $this->_options['name'] .'" was successfully created.');
