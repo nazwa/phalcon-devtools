@@ -1,6 +1,6 @@
 <?php
 
-return new \Phalcon\Config(array(  
+return new \Phalcon\Config(array(
     'database' => array(
         'adapter'    => 'Mysql',
         'host'       => 'localhost',
@@ -9,8 +9,8 @@ return new \Phalcon\Config(array(
         'dbname'     => 'test',
     ),
     'application' => array(
-        'modelsDir'      => __DIR__ . '/../models/',      
-        'viewsDir'      => __DIR__ . '/../views/',
+        'modelsDir'      => APP_PATH . '/models/',
+        'viewsDir'       => APP_PATH . '/views/',
         'baseUri'        => '/@@name@@/',
-    )                                             
+    )
 ));
